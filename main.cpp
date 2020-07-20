@@ -1,56 +1,71 @@
 #include <iostream>
+#include <string>
 using namespace std;
 
-int main() {
-    int test_case, N, M;
-    bool answer_printed = false;
-    cin >> test_case;
+int* arr = new int[100010];
+int start = 5000;
+int last = 5001;
 
-    while(test_case--){
-        cin >> N >> M;
-        // initialization
-        int* arr = new int[1000000];
-        int start = 0, last = N;
-        int count = 1;
-        int max_imp = 0;
-        for(int i=0; i<N; i++) {
-            cin >> arr[i];
-            if(arr[i] > max_imp) max_imp = arr[i];
-        }
-        // ordering
-        while(last - start != 1){
-            // pop_and_push_it_back
-            if(arr[start] != max_imp) {
-                // moving M
-                if(start == M) M = last;
-                arr[last] = arr[start];
-                start++;
-                last++;
-                continue;
-            }
-
-            // pop max_importance
-            else if(arr[start] == max_imp) {
-                // answer choice
-                if(start == M) {
-                    cout << count << '\n';
-                    answer_printed = true;
-                    break;
-                }
-                // not the answer choice
-                else {
-                    count++;
-                    start++;
-                    // find the next max_imp
-                    max_imp = 0;
-                    for(int j = start; j < last; j++) if(arr[j] > max_imp) max_imp = arr[j];
-                    continue;
-                }
-            }
-        }
-        // only one input
-        if(!answer_printed) cout  << count << '\n';
-        answer_printed = false;
-        delete[] arr;
+void deque_func(string s) {
+    int num = 0;
+    if(s == "push_front") {
+        cin >> num;
+        arr[start] = num;
+        start--;
     }
+
+    else if(s == "push_back") {
+        cin >> num;
+        arr[last] = num;
+        last++;
+    }
+
+    else if(s == "pop_front") {
+        if(last - start == 1) cout << -1 << '\n';
+        else {
+            cout << arr[start + 1] << '\n';
+            start++;
+        }
+    }
+
+    else if(s == "pop_back") {
+        if(last - start == 1) cout << -1 << '\n';
+        else {
+            cout << arr[last - 1] << '\n';
+            last--;
+        }
+    }
+
+    else if(s == "size") {
+        cout << last - start - 1 << '\n';
+    }
+
+    else if(s == "empty") {
+        if(last - start == 1) cout << 1 << '\n';
+        else cout << 0 << '\n';
+    }
+
+    else if(s == "front"){
+        if(last - start == 1) cout << -1 << '\n';
+        else cout << arr[start + 1] << '\n';
+    }
+
+    else if(s == "back"){
+        if(last - start == 1) cout << -1 << '\n';
+        else cout << arr[last - 1] << '\n';
+    }
+}
+
+int main() {
+    int N;
+    cin >> N;
+
+
+    while(N--){
+        string input_s;
+        cin >> input_s;
+        deque_func(input_s);
+    }
+
+    delete[] arr;
 }
