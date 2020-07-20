@@ -1,36 +1,36 @@
 #include <iostream>
 using namespace std;
-#define size 5000001
-
+#define size 10000000
 int* arr = new int[size];
 int start = 0;
 int last = 0;
+bool first = true;
 
-void pop() {
-    start++;
-}
+int main(){
+    int N, K;
+    cin >> N >> K;
 
-void pop_and_push_back(){
-    arr[last] = arr[start];
-    last++;
-    start++;
-}
-
-int main() {
-    int N;
-    cin >> N;
-    //initialization
+    //initialize
     last = N;
-    for(int i = 0; i < N; i++) {
-        arr[i] = i+1;
-    }
+    for(int i = 0; i < N; i++)
+        arr[i] = i + 1;
 
-    //ordering until one number lasts
+    //ordering
+    cout << "<";
     while(last - start != 1) {
-        pop();
-        pop_and_push_back();
+        for(int j = 0; j < K - 1; j++){
+            arr[last] = arr[start];
+            last++;
+            start++;
+        }
+        if(!first) cout << ", ";
+        if(first) first = false;
+        cout << arr[start];
+
+        start++;
     }
+    if(!first) cout << ", ";
+    cout << arr[start] << "> \n";
 
-    cout << arr[start] << '\n';
-
+    delete[] arr;
 }
