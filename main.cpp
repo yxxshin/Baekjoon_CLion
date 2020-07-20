@@ -1,71 +1,61 @@
 #include <iostream>
-#include <string>
 using namespace std;
 
-int* arr = new int[100010];
-int start = 5000;
-int last = 5001;
-
-void deque_func(string s) {
-    int num = 0;
-    if(s == "push_front") {
-        cin >> num;
-        arr[start] = num;
-        start--;
-    }
-
-    else if(s == "push_back") {
-        cin >> num;
-        arr[last] = num;
-        last++;
-    }
-
-    else if(s == "pop_front") {
-        if(last - start == 1) cout << -1 << '\n';
-        else {
-            cout << arr[start + 1] << '\n';
-            start++;
-        }
-    }
-
-    else if(s == "pop_back") {
-        if(last - start == 1) cout << -1 << '\n';
-        else {
-            cout << arr[last - 1] << '\n';
-            last--;
-        }
-    }
-
-    else if(s == "size") {
-        cout << last - start - 1 << '\n';
-    }
-
-    else if(s == "empty") {
-        if(last - start == 1) cout << 1 << '\n';
-        else cout << 0 << '\n';
-    }
-
-    else if(s == "front"){
-        if(last - start == 1) cout << -1 << '\n';
-        else cout << arr[start + 1] << '\n';
-    }
-
-    else if(s == "back"){
-        if(last - start == 1) cout << -1 << '\n';
-        else cout << arr[last - 1] << '\n';
-    }
-}
-
 int main() {
-    int N;
-    cin >> N;
+    int N, M;
+    cin >> N >> M;
+    int* arr = new int[1000];
+    int* brr = new int[M];
+    int start = 500;
+    int last = 501 + N;
+    int brr_count = 0;
+    int answer = 0;
 
+    //initialization
+    for(int i = 1; i <= N; i++)
+        arr[start + i] = i;
+    for(int i = 0; i < M; i++)
+        cin >> brr[i];
 
-    while(N--){
-        string input_s;
-        cin >> input_s;
-        deque_func(input_s);
+    //ordering
+    while(brr_count < M) {
+        // find the location of the next popping number
+        int index_finding = 0;
+        for(int i = start + 1; i < last; i++) {
+            if(arr[i] == brr[brr_count]) {
+                index_finding = i;
+                break;
+            }
+        }
+
+        // compare which way is faster
+        // when action 2 is faster
+        if(index_finding - start - 1 < last - index_finding) {
+            int num_for = index_finding - start - 1;
+            for(int i = 0; i < num_for; i++) {
+                arr[last] = arr[start + 1];
+                start++;
+                last++;
+                answer++;
+            }
+            start++; // pop_front
+            brr_count++;
+        }
+
+        // when action 3 is faster or same
+        else {
+            int num_for = last - index_finding;
+            for(int i=0; i < num_for ; i++ ) {
+                arr[start] = arr[last - 1];
+                start--;
+                last--;
+                answer++;
+            }
+            start++; // pop_front
+            brr_count++;
+        }
     }
 
-    delete[] arr;
+    cout << answer << '\n';
+
 }
