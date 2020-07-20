@@ -1,36 +1,56 @@
 #include <iostream>
 using namespace std;
-#define size 10000000
-int* arr = new int[size];
-int start = 0;
-int last = 0;
-bool first = true;
 
-int main(){
-    int N, K;
-    cin >> N >> K;
+int main() {
+    int test_case, N, M;
+    bool answer_printed = false;
+    cin >> test_case;
 
-    //initialize
-    last = N;
-    for(int i = 0; i < N; i++)
-        arr[i] = i + 1;
-
-    //ordering
-    cout << "<";
-    while(last - start != 1) {
-        for(int j = 0; j < K - 1; j++){
-            arr[last] = arr[start];
-            last++;
-            start++;
+    while(test_case--){
+        cin >> N >> M;
+        // initialization
+        int* arr = new int[1000000];
+        int start = 0, last = N;
+        int count = 1;
+        int max_imp = 0;
+        for(int i=0; i<N; i++) {
+            cin >> arr[i];
+            if(arr[i] > max_imp) max_imp = arr[i];
         }
-        if(!first) cout << ", ";
-        if(first) first = false;
-        cout << arr[start];
+        // ordering
+        while(last - start != 1){
+            // pop_and_push_it_back
+            if(arr[start] != max_imp) {
+                // moving M
+                if(start == M) M = last;
+                arr[last] = arr[start];
+                start++;
+                last++;
+                continue;
+            }
 
-        start++;
+            // pop max_importance
+            else if(arr[start] == max_imp) {
+                // answer choice
+                if(start == M) {
+                    cout << count << '\n';
+                    answer_printed = true;
+                    break;
+                }
+                // not the answer choice
+                else {
+                    count++;
+                    start++;
+                    // find the next max_imp
+                    max_imp = 0;
+                    for(int j = start; j < last; j++) if(arr[j] > max_imp) max_imp = arr[j];
+                    continue;
+                }
+            }
+        }
+        // only one input
+        if(!answer_printed) cout  << count << '\n';
+        answer_printed = false;
+        delete[] arr;
     }
-    if(!first) cout << ", ";
-    cout << arr[start] << "> \n";
-
-    delete[] arr;
 }
