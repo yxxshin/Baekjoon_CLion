@@ -1,61 +1,81 @@
 #include <iostream>
+#include <string>
 using namespace std;
 
 int main() {
-    int N, M;
-    cin >> N >> M;
-    int* arr = new int[1000];
-    int* brr = new int[M];
-    int start = 500;
-    int last = 501 + N;
-    int brr_count = 0;
-    int answer = 0;
+    int T, n;
+    string p, input_array;
+    cin >> T;
 
-    //initialization
-    for(int i = 1; i <= N; i++)
-        arr[start + i] = i;
-    for(int i = 0; i < M; i++)
-        cin >> brr[i];
+    while(T--){
+        //test case start
+        cin >> p;
+        cin >> n;
+        cin >> input_array;
 
-    //ordering
-    while(brr_count < M) {
-        // find the location of the next popping number
-        int index_finding = 0;
-        for(int i = start + 1; i < last; i++) {
-            if(arr[i] == brr[brr_count]) {
-                index_finding = i;
-                break;
+        int* arr = new int[400010];
+        int arr_count = 1;
+        int start = 0;
+        int last = n + 1;
+        bool is_error = false;
+        bool is_reverse = false;
+
+        // input array
+        int k = 1;
+        while(input_array[k] != '\0') {
+            int x = 0;
+            while(input_array[k] >= '0' && input_array[k] <= '9') {
+                x *= 10;
+                x += int(input_array[k] - '0');
+                k++;
+            }
+            if( x != 0 ){
+                arr[arr_count] = x;
+                arr_count++;
+            }
+            k++;
+        }
+
+        // do actions
+        for(int j = 0; j < p.length(); j++) {
+            if(p[j] == 'R'){
+                // check if it is reverse or not
+                is_reverse = !is_reverse;
+            }
+
+            else if(p[j] == 'D'){
+                // delete first number or last number
+                // if array is empty
+                if(last - start == 1) {
+                    is_error = true;
+                    break;
+                }
+                // if array is not empty:
+                else {
+                    if(is_reverse) last--;
+                    else if(!is_reverse) start++;
+                }
             }
         }
 
-        // compare which way is faster
-        // when action 2 is faster
-        if(index_finding - start - 1 < last - index_finding) {
-            int num_for = index_finding - start - 1;
-            for(int i = 0; i < num_for; i++) {
-                arr[last] = arr[start + 1];
-                start++;
-                last++;
-                answer++;
-            }
-            start++; // pop_front
-            brr_count++;
-        }
-
-        // when action 3 is faster or same
+        if(is_error) cout << "error" << '\n';
         else {
-            int num_for = last - index_finding;
-            for(int i=0; i < num_for ; i++ ) {
-                arr[start] = arr[last - 1];
-                start--;
-                last--;
-                answer++;
+            cout << "[";
+            if(!is_reverse){
+                for(int i = start + 1; i < last - 1; i++)
+                    cout << arr[i] << ",";
+                if(last - start != 1) cout << arr[last-1];
+                cout << "]" << '\n';
             }
-            start++; // pop_front
-            brr_count++;
+            else if(is_reverse){
+                for(int i = last - 1; i > start + 1; i--)
+                    cout << arr[i] << ",";
+                if(last - start != 1) cout << arr[start + 1];
+                cout << "]" << '\n';
+            }
+
         }
+        is_error = false;
+        p = "";
     }
-
-    cout << answer << '\n';
-
 }
