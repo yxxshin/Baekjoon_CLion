@@ -1,81 +1,53 @@
 #include <iostream>
-#include <string>
 using namespace std;
 
-int main() {
-    int T, n;
-    string p, input_array;
-    cin >> T;
+int count_white = 0, count_blue = 0;
 
-    while(T--){
-        //test case start
-        cin >> p;
-        cin >> n;
-        cin >> input_array;
+void split_func(int** arr, int size, int x_index, int y_index) {
+    bool is_all_white = true;
+    bool is_all_blue = true;
 
-        int* arr = new int[400010];
-        int arr_count = 1;
-        int start = 0;
-        int last = n + 1;
-        bool is_error = false;
-        bool is_reverse = false;
-
-        // input array
-        int k = 1;
-        while(input_array[k] != '\0') {
-            int x = 0;
-            while(input_array[k] >= '0' && input_array[k] <= '9') {
-                x *= 10;
-                x += int(input_array[k] - '0');
-                k++;
-            }
-            if( x != 0 ){
-                arr[arr_count] = x;
-                arr_count++;
-            }
-            k++;
+    for(int i = 0; i < size; i++) {
+        for(int j = 0; j < size; j++){
+            if(arr[x_index + i][y_index + j] == 0) is_all_blue = false; // arr[index+i][index+j] is white
+            else is_all_white = false;  // arr[index+i][index+j] is blue
         }
-
-        // do actions
-        for(int j = 0; j < p.length(); j++) {
-            if(p[j] == 'R'){
-                // check if it is reverse or not
-                is_reverse = !is_reverse;
-            }
-
-            else if(p[j] == 'D'){
-                // delete first number or last number
-                // if array is empty
-                if(last - start == 1) {
-                    is_error = true;
-                    break;
-                }
-                // if array is not empty:
-                else {
-                    if(is_reverse) last--;
-                    else if(!is_reverse) start++;
-                }
-            }
-        }
-
-        if(is_error) cout << "error" << '\n';
-        else {
-            cout << "[";
-            if(!is_reverse){
-                for(int i = start + 1; i < last - 1; i++)
-                    cout << arr[i] << ",";
-                if(last - start != 1) cout << arr[last-1];
-                cout << "]" << '\n';
-            }
-            else if(is_reverse){
-                for(int i = last - 1; i > start + 1; i--)
-                    cout << arr[i] << ",";
-                if(last - start != 1) cout << arr[start + 1];
-                cout << "]" << '\n';
-            }
-
-        }
-        is_error = false;
-        p = "";
     }
+
+    if(is_all_white) count_white++;
+    else if(is_all_blue) count_blue++;
+    else {
+        split_func(arr, size/2, x_index, y_index);
+        split_func(arr, size/2, x_index + size/2, y_index);
+        split_func(arr, size/2, x_index, y_index + size/2);
+        split_func(arr, size/2, x_index + size/2, y_index + size/2);
+    }
+
+}
+
+int main() {
+    int N;
+    cin >> N;
+
+    // Dynamic Memory Allocation
+    int** arr = new int*[N];
+    for(int i = 0; i < N; i++)
+        arr[i] = new int[N];
+
+    // input array
+    for(int i = 0; i < N; i++) {
+        for (int j = 0; j < N; j++) {
+            cin >> arr[i][j];
+        }
+    }
+
+    // main action
+    split_func(arr, N, 0, 0);
+    cout << count_white << '\n';
+    cout << count_blue << '\n';
+
+    // Delete Memory
+    for(int i = 0; i < N; i++)
+        delete[] arr[i];
+    delete[] arr;
 }
