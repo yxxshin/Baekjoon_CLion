@@ -1,12 +1,15 @@
 #include <iostream>
 using namespace std;
 
+long long multiply_split(long long a, long long b, long long c) {  // a^b = ? (mod c)
+    if(b == 0) return 1;
+
+    if(b%2 == 1) return ((a%c) * (multiply_split(a, b/2, c)) % c * (multiply_split(a, b/2, c) % c)) % c;
+    else return ((multiply_split(a, b/2, c) % c) * (multiply_split(a, b/2, c) % c)) % c;
+}
+
 int main() {
-    int x, y;
-    cin >> x;
-    cin >> y;
-    if(x > 0 && y > 0) cout << 1 << '\n';
-    else if(x > 0 && y < 0) cout << 4 << '\n';
-    else if(x < 0 && y > 0) cout << 2 << '\n';
-    else if(x < 0 && y < 0) cout << 3 << '\n';
+    long long A, B, C;
+    cin >> A >> B >> C;
+    cout << multiply_split(A, B, C) << '\n';
 }
