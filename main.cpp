@@ -1,43 +1,43 @@
 #include <iostream>
 using namespace std;
-int arr[65][65];
 
-void Quadtree(int n, int first, int second) {
-    bool isZero = false;
-    bool isOne = false;
+int arr[2188][2188];
+int counter[3] = {0,};   // count[0]: -1, count[1]: 0, count[2]: 1의 개수
+
+bool isSame(int n, int first, int second) {
     for(int i = 0; i < n; i++){
         for(int j = 0; j < n; j++){
-            if(arr[first+i][second+j] == 0) isZero = true;
-            else if(arr[first+i][second+j] == 1) isOne = true;
+            if(arr[first + i][second + j] != arr[first][second])
+                return false;
         }
     }
-    if(isZero && isOne) {
-        cout << "(";
-        Quadtree(n/2, first, second);
-        Quadtree(n/2, first, second + n/2);
-        Quadtree(n/2, first + n/2, second);
-        Quadtree(n/2, first + n/2, second + n/2);
-    }
-    else if(isZero == false) {
-        cout << "1";
+    return true;
+}
+
+void Trippletree(int n, int first, int second) {
+    if(isSame(n, first, second)){
+        counter[arr[first][second] + 1]++;
         return;
     }
-    else if(isOne == false) {
-        cout << "0";
-        return;
+    else {
+        for(int i = 0; i < 3; i++){
+            for(int j = 0; j < 3; j++) {
+                Trippletree(n/3, first + i * n/3, second + j * n/3);
+            }
+        }
     }
-    cout << ")";
 }
 
 int main() {
     int N;
     cin >> N;
-    char c;
     for(int i = 0; i < N; i++){
         for(int j = 0; j < N; j++){
-            cin >> c;
-            arr[i][j] = (int)(c-'0');
+            cin >> arr[i][j];
         }
     }
-    Quadtree(N, 0, 0);
+    Trippletree(N, 0, 0);
+
+    for(int i = 0; i < 3; i++)
+        cout << counter[i] << '\n';
 }
