@@ -1,74 +1,43 @@
 #include <iostream>
-#include <vector>
 using namespace std;
+int arr[65][65];
 
-int N = 2;
-
-vector<vector<long long>> multiply_matrix(vector<vector<long long>> &v1, vector<vector<long long>> &v2) {
-    // calculate v1 * v2
-    vector<vector<long long>> ans;
-
-    for(int i = 0; i < N; i++){
-        vector<long long> temp;
-        for(int j = 0; j < N; j++){
-            long long int val = 0;
-            for(int k = 0; k < N; k++){
-                val += ((v1[i][k] % 1000000) * (v2[k][j] % 1000000)) % 1000000;
-            }
-            val %= 1000000;
-            temp.push_back(val);
+void Quadtree(int n, int first, int second) {
+    bool isZero = false;
+    bool isOne = false;
+    for(int i = 0; i < n; i++){
+        for(int j = 0; j < n; j++){
+            if(arr[first+i][second+j] == 0) isZero = true;
+            else if(arr[first+i][second+j] == 1) isOne = true;
         }
-        ans.push_back(temp);
     }
-
-    return ans;
-}
-
-vector<vector<long long>> pow_matrix(vector<vector<long long>> &v, long long int B){
-    if(B == 1) {
-        for(int i = 0; i < N; i++){
-            for(int j = 0; j < N; j++){
-                v[i][j] %= 1000000;
-            }
-        }
-        return v;
+    if(isZero && isOne) {
+        cout << "(";
+        Quadtree(n/2, first, second);
+        Quadtree(n/2, first, second + n/2);
+        Quadtree(n/2, first + n/2, second);
+        Quadtree(n/2, first + n/2, second + n/2);
     }
-    else if(B % 2 == 0) {
-        vector<vector<long long>> temp1 = pow_matrix(v, B/2);
-        vector<vector<long long>> temp2 = multiply_matrix(temp1, temp1);
-        return temp2;
+    else if(isZero == false) {
+        cout << "1";
+        return;
     }
-    else {
-        vector<vector<long long>> temp1 = pow_matrix(v, B/2);
-        vector<vector<long long>> temp2 = multiply_matrix(temp1, temp1);
-        vector<vector<long long>> temp3 = multiply_matrix(v, temp2);
-        return temp3;
+    else if(isOne == false) {
+        cout << "0";
+        return;
     }
+    cout << ")";
 }
 
 int main() {
-    long long int n;
-    cin >> n;
-
-    // input array [[1,1],[1,0]]
-    vector<vector<long long>> arr;
-    vector<long long> temp;
-    temp.push_back(1);
-    temp.push_back(1);
-    arr.push_back(temp);
-    temp.pop_back();
-    temp.push_back(0);
-    arr.push_back(temp);
-
-    // multiply
-    if(n <= 1) {
-        cout << n << '\n';
-        return 0;
+    int N;
+    cin >> N;
+    char c;
+    for(int i = 0; i < N; i++){
+        for(int j = 0; j < N; j++){
+            cin >> c;
+            arr[i][j] = (int)(c-'0');
+        }
     }
-    vector<vector<long long>> ans;
-    ans = pow_matrix(arr, n-1);
-
-    // print
-    cout << ans[0][0] << '\n';
-
+    Quadtree(N, 0, 0);
 }
