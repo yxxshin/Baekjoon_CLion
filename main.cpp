@@ -4,9 +4,9 @@ using namespace std;
 
 int N, M;
 
-void Binaray_Search(int* arr, int target) {
-    // arr should be sorted
-    int left = 0, right = N - 1;
+int Upper_Bound(int* arr, int target) {
+    int upper_bound = -1;
+    int left = 0, right = N-1;
     while(left <= right) {
         int middle = (left + right) / 2;
         if(arr[middle] > target) {
@@ -18,12 +18,34 @@ void Binaray_Search(int* arr, int target) {
             continue;
         }
         else if(arr[middle] == target) {
-            printf("1\n");
-            return;
+            upper_bound = middle;
+            left = middle + 1;
+            continue;
         }
     }
-    // target doesn't exist in arr
-    printf("0\n");
+    return upper_bound;
+}
+
+int Lower_Bound(int* arr, int target) {
+    int lower_bound = -1;
+    int left = 0, right = N-1;
+    while(left <= right) {
+        int middle = (left + right) / 2;
+        if(arr[middle] > target) {
+            right = middle - 1;
+            continue;
+        }
+        else if(arr[middle] < target) {
+            left = middle + 1;
+            continue;
+        }
+        else if(arr[middle] == target) {
+            lower_bound = middle;
+            right = middle - 1;
+            continue;
+        }
+    }
+    return lower_bound;
 }
 
 int main() {
@@ -44,7 +66,10 @@ int main() {
 
     // Binaray Search
     for(int i = 0; i < M; i++){
-        Binaray_Search(arr, brr[i]);
+        int upper = Upper_Bound(arr, brr[i]);
+        int lower = Lower_Bound(arr, brr[i]);
+        if(upper == -1) printf("0 ");   // brr[i] doesn't exist in arr
+        else printf("%d ", upper - lower + 1);
     }
 
     delete[] arr;
