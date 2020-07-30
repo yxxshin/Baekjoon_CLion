@@ -2,76 +2,37 @@
 #include <algorithm>
 using namespace std;
 
-int N, M;
-
-int Upper_Bound(int* arr, int target) {
-    int upper_bound = -1;
-    int left = 0, right = N-1;
-    while(left <= right) {
-        int middle = (left + right) / 2;
-        if(arr[middle] > target) {
-            right = middle - 1;
-            continue;
-        }
-        else if(arr[middle] < target) {
-            left = middle + 1;
-            continue;
-        }
-        else if(arr[middle] == target) {
-            upper_bound = middle;
-            left = middle + 1;
-            continue;
-        }
-    }
-    return upper_bound;
-}
-
-int Lower_Bound(int* arr, int target) {
-    int lower_bound = -1;
-    int left = 0, right = N-1;
-    while(left <= right) {
-        int middle = (left + right) / 2;
-        if(arr[middle] > target) {
-            right = middle - 1;
-            continue;
-        }
-        else if(arr[middle] < target) {
-            left = middle + 1;
-            continue;
-        }
-        else if(arr[middle] == target) {
-            lower_bound = middle;
-            right = middle - 1;
-            continue;
-        }
-    }
-    return lower_bound;
-}
+int K, N;
 
 int main() {
     // get inputs
-    scanf("%d",&N);
-    int* arr = new int[N];
-    for(int i = 0; i < N; i++){
-        scanf("%d",&arr[i]);
-    }
-    scanf("%d",&M);
-    int* brr = new int[M];
-    for(int i = 0; i < M; i++){
-        scanf("%d",&brr[i]);
+    scanf("%d %d", &K, &N);
+    long long int* arr = new long long int[K];
+    for(int i = 0; i < K; i++){
+        scanf("%lld",&arr[i]);
     }
 
-    // sort array
-    sort(arr, arr+N);
+    // sort input array
+    sort(arr, arr+K);
 
     // Binaray Search
-    for(int i = 0; i < M; i++){
-        int upper = Upper_Bound(arr, brr[i]);
-        int lower = Lower_Bound(arr, brr[i]);
-        if(upper == -1) printf("0 ");   // brr[i] doesn't exist in arr
-        else printf("%d ", upper - lower + 1);
+    long long int left, right, middle, answer = 0;
+    left = 1, right = arr[K-1];
+
+    while(left <= right) {
+        long long int count = 0;
+        middle = (left + right) / 2;
+        for(int i = 0; i < K; i++){
+            count += (arr[i]/middle);
+        }
+
+        if(count < N) right = middle - 1;
+        else if(count >= N) {
+            if(middle > answer) answer = middle;
+            left = middle + 1;
+        }
     }
 
+    printf("%lld\n", answer);
     delete[] arr;
-    delete[] brr;
 }
