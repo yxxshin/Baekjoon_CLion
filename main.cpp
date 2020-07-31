@@ -1,56 +1,38 @@
 #include <cstdio>
+#include <iostream>
 #include <algorithm>
+
 using namespace std;
 
-int N, C;
+long long int N;
+int k;
 
 int main() {
-    // get inputs
-    scanf("%d %d", &N, &C);
-    long long int* arr = new long long int[N];
-    for(int i = 0; i < N; i++){
-        scanf("%lld",&arr[i]);
-    }
+    scanf("%d",&N);
+    scanf("%d",&k);
 
-    // sort input array
-    sort(arr, arr+N);
-
-    // Binaray Search
-    long long int left, right, middle, answer = 0;
-    int temp, next, count;
-    left = 1, right = arr[N-1] - arr[0];
-
+    long long int count = 0;
+    long long int left = 1, right = N * N;
+    long long int middle, answer;
     while(left <= right) {
+        count = 0;
         middle = (left + right) / 2;
-        temp = 0, next = 1, count = 1;
 
-        // check if this case is possible
-        while(next < N){
-            if(arr[next] - arr[temp] < middle) {
-                // shouldn't place
-                next++;
-            }
-
-            else if(arr[next] - arr[temp] >= middle) {
-                // place
-                temp = next;
-                next++;
-                count++;
-            }
+        // count how many numbers are lower than middle
+        for(long long int i = 1; i <= N; i++){
+           count += min(N, middle/i);
         }
 
-        if(count >= C) {
-            // okay, but should check more
-            answer = middle;
+        if(count < k){
             left = middle + 1;
         }
 
-        else if(count < C){
-            // need to place more
+        else if(count >= k) {
+            // the answer should be the minimum value
+            answer = middle;
             right = middle - 1;
         }
     }
 
-    printf("%lld\n", answer);
-    delete[] arr;
+    printf("%lld\n",answer);
 }
