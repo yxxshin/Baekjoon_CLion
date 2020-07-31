@@ -1,38 +1,44 @@
 #include <cstdio>
-#include <iostream>
 #include <algorithm>
+#include <vector>
 
 using namespace std;
 
-long long int N;
-int k;
-
 int main() {
+    // put inputs
+    int N;
     scanf("%d",&N);
-    scanf("%d",&k);
 
-    long long int count = 0;
-    long long int left = 1, right = N * N;
-    long long int middle, answer;
-    while(left <= right) {
-        count = 0;
-        middle = (left + right) / 2;
+    int* arr = new int[N];
+    for(int i = 0; i < N; i++){
+        scanf("%d",&arr[i]);
+    }
 
-        // count how many numbers are lower than middle
-        for(long long int i = 1; i <= N; i++){
-           count += min(N, middle/i);
+    // use LIS vector
+    vector<int> LIS;
+    LIS.push_back(0);
+    int len = 0;
+
+    for(int i = 0; i < N; i++){
+        // if next arr number is bigger than the biggest value in LIS
+        if(arr[i] > LIS.back()){
+            // push back(update)
+            LIS.push_back(arr[i]);
+            len++;
         }
 
-        if(count < k){
-            left = middle + 1;
-        }
-
-        else if(count >= k) {
-            // the answer should be the minimum value
-            answer = middle;
-            right = middle - 1;
+        // if not: switch this value in the alright place
+        else {
+            // find the lower bound and switch: Binaray Search
+            int left = 0, right = LIS.size(), middle;
+            while(left < right) {
+                middle = (left + right) / 2;
+                if(LIS[middle] < arr[i]) left = middle + 1;
+                else right = middle;
+            }
+            LIS[right] = arr[i];
         }
     }
 
-    printf("%lld\n",answer);
+    printf("%d\n",len);
 }
