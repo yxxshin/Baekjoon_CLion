@@ -4,26 +4,39 @@
 using namespace std;
 
 int main() {
-    // use priority_queue
-    priority_queue<pair<int, int>> pq;
-    // first: -abs(number), second: 1 or -1 => original number: first * second
-    // why? default is greater<int> : big values come first
-    int N, num;
-    scanf("%d", &N);
+    int N;
+    // make two priority queues: max and min
+    // max_pq is less<int>, min_pq is greater<int>
+    // every numbers in min_pq are bigger than every numbers in max_pq
+    // every time, max_pq.size() should be same or 1 bigger than min_pq.size()
+    priority_queue<int, vector<int>, less<int>> max_pq;
+    priority_queue<int, vector<int>, greater<int>> min_pq;
 
-    for(int i = 0; i < N; i++) {
+    scanf("%d",&N);
+    while(N--) {
+        // get input
+        int num;
         scanf("%d", &num);
-        if(num == 0) {
-            if(pq.empty()) {
-                printf("0\n");
-            } else {
-                // queue is not empty
-                printf("%d\n", pq.top().first * pq.top().second);
-                pq.pop();
-            }
-        } else {
-            if(num < 0) pq.push({num, 1});
-            else pq.push({-num, -1});
+
+        // push num
+        if(max_pq.size() == min_pq.size()) {
+            max_pq.push(num);
         }
+        else min_pq.push(num);
+
+        // sort
+        if(!min_pq.empty() && max_pq.top() > min_pq.top()) {
+            // swap the two top values
+            int min_temp = min_pq.top();
+            int max_temp = max_pq.top();
+            min_pq.pop();
+            max_pq.pop();
+            min_pq.push(max_temp);
+            max_pq.push(min_temp);
+        }
+
+        // print middle value: top of max_pq
+        printf("%d\n", max_pq.top());
     }
+
 }
