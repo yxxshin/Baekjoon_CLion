@@ -22,7 +22,7 @@ void push_heap(long long int x){
     // sort the heap
     int child = size, parent = child/2;
     while(parent >= 1) {
-        if(arr[child] > arr[parent]){
+        if(arr[child] < arr[parent]){
             SWAP(arr[child], arr[parent], long long int);
             child /= 2;
             parent = child/2;
@@ -31,14 +31,14 @@ void push_heap(long long int x){
     }
 }
 
-// pop max number
+// pop min number
 void pop_heap(){
     if(size == 0) {
         printf("0\n");
         return;
     }
 
-    long long int max_num = arr[1];
+    long long int min_num = arr[1];
     arr[1] = arr[size];
     arr[size] = 0;
     size--;                 // copy the last value to the top, and delete
@@ -47,9 +47,10 @@ void pop_heap(){
     int parent = 1;
     while(parent * 2 <= size) {
         // compare the parent node with two childs
-        if(arr[parent] < max(arr[parent*2], arr[parent*2 +1]) ) {
-            // swap with the bigger child
-            if(arr[parent*2] > arr[parent*2+1]) {
+        // you should have two childs
+        if(arr[parent] > min(arr[parent*2], arr[parent*2 +1]) && arr[parent*2+1] != 0 ) {
+            // swap with the smaller child
+            if(arr[parent*2] < arr[parent*2+1]) {
                 SWAP(arr[parent], arr[parent*2], long long int);
                 parent = parent * 2;
             }
@@ -58,10 +59,15 @@ void pop_heap(){
                 parent = parent * 2 + 1;
             }
         }
+        // if you have only one child
+        else if(arr[parent] > arr[parent*2] && arr[parent*2+1] == 0 ) {
+            SWAP(arr[parent], arr[parent*2], long long int);
+            parent = parent * 2;
+        }
         else break;
     }
-    // print max number
-    printf("%lld\n",max_num);
+    // print min number
+    printf("%lld\n",min_num);
 }
 
 
