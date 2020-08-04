@@ -1,35 +1,56 @@
 #include <cstdio>
-#include <iostream>
-#include <climits>
-
 using namespace std;
 
-struct Array {
-    int r, c;
-} ;
+int M, N;
+int map[502][502] = {0,};
+int dp[502][502] = {0,};    // number of cases from map[i][j] to end
 
-int main() {
-    int N;
-    scanf("%d",&N);
-    Array* arr = new Array[N+2];
-    for(int i = 1; i <= N; i++){
-        scanf("%d",&arr[i].r);
-        scanf("%d",&arr[i].c);
+int func(int i, int j){
+    // starts from map[i][j]
+    // Dynamic Programming: if already value exists, use it
+    if(dp[i][j] != -1){  // dp[i][j] = -1 : not visited
+        return dp[i][j];
     }
+    else {
+        dp[i][j] = 0;
 
-    // Dynamic Programming
-    int dp[502][502] = {0,};    // dp[i][j] = minimum value of arr[i] * ... * arr[j]
+        if(map[i+1][j] < map[i][j] && i+1 <= M) {
+            // move to map[i+1][j]
+            dp[i][j] += func(i+1, j);
+        }
 
-    for(int d = 1; d < N; d++) {
-        for(int i = 1; i+d <= N; i++){
-            dp[i][i+d] = INT_MAX;
-            for(int temp = i; temp < i+d; temp++){
-                dp[i][i+d] = min(dp[i][i+d], dp[i][temp] + dp[temp+1][i+d] + arr[i].r * arr[temp].c * arr[i+d].c);
-            }
+        if(map[i-1][j] < map[i][j] && i-1 >= 1){
+            // move to map[i-1][j]
+            dp[i][j] += func(i-1, j);
+        }
+
+        if(map[i][j+1] < map[i][j] && j+1 <= N){
+            // move to map[i][j+1]
+            dp[i][j] += func(i, j+1);
+        }
+
+        if(map[i][j-1] < map[i][j] && j-1 >= 0){
+            // move to map[i][j-1]
+            dp[i][j] += func(i, j-1);
         }
     }
 
-    printf("%d\n", dp[1][N]);
+   return dp[i][j];
+}
 
-    delete[] arr;
+
+int main() {
+    scanf("%d %d", &M, &N);
+
+    for(int i = 1; i <= M; i++){
+        for(int j = 1; j <= N; j++){
+            scanf("%d", &map[i][j]);
+            dp[i][j] = -1;
+        }
+    }
+    // start from map[1][1]
+    // find every cases
+    dp[M][N] = 1;
+    int answer = func(1,1);
+    printf("%d\n", answer);
 }
