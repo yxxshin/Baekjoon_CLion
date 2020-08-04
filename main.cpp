@@ -1,56 +1,54 @@
 #include <cstdio>
+#include <cstring>
+
 using namespace std;
 
-int M, N;
-int map[502][502] = {0,};
-int dp[502][502] = {0,};    // number of cases from map[i][j] to end
-
-int func(int i, int j){
-    // starts from map[i][j]
-    // Dynamic Programming: if already value exists, use it
-    if(dp[i][j] != -1){  // dp[i][j] = -1 : not visited
-        return dp[i][j];
-    }
-    else {
-        dp[i][j] = 0;
-
-        if(map[i+1][j] < map[i][j] && i+1 <= M) {
-            // move to map[i+1][j]
-            dp[i][j] += func(i+1, j);
-        }
-
-        if(map[i-1][j] < map[i][j] && i-1 >= 1){
-            // move to map[i-1][j]
-            dp[i][j] += func(i-1, j);
-        }
-
-        if(map[i][j+1] < map[i][j] && j+1 <= N){
-            // move to map[i][j+1]
-            dp[i][j] += func(i, j+1);
-        }
-
-        if(map[i][j-1] < map[i][j] && j-1 >= 0){
-            // move to map[i][j-1]
-            dp[i][j] += func(i, j-1);
-        }
-    }
-
-   return dp[i][j];
-}
-
+int N, M;
+int memory[100], cost[100];
+int dp[10001];     // dp[i] : the max value of memory using cost i
 
 int main() {
-    scanf("%d %d", &M, &N);
+    // get inputs
+    scanf("%d %d",&N,&M);
+    for(int i = 0; i < N; i++){
+        scanf("%d",&memory[i]);
+    }
+    for(int i = 0; i < N; i++){
+        scanf("%d",&cost[i]);
+    }
 
-    for(int i = 1; i <= M; i++){
-        for(int j = 1; j <= N; j++){
-            scanf("%d", &map[i][j]);
-            dp[i][j] = -1;
+    // make dp[i] all -1, to know if visited or not
+    memset(dp, -1, sizeof(dp));
+
+    for(int i = 0; i < N; i++){
+        // consider about using c[i]
+        // update from the back : prevent overlapping
+        int temp_cost = cost[i];
+
+        for(int j = 10000; j >= cost[i]; j--) {
+            if(dp[j - temp_cost] == -1) {
+                // not visited
+                continue;
+            }
+
+            if(dp[j - temp_cost] + memory[i] > dp[j]) {
+                // better condition : swap
+                dp[j] = dp[j -temp_cost] + memory[i];
+            }
+        }
+
+        if(dp[temp_cost] < memory[i]) {
+            // when just using itself(i'th) is better : swap
+            dp[temp_cost] = memory[i];
         }
     }
-    // start from map[1][1]
-    // find every cases
-    dp[M][N] = 1;
-    int answer = func(1,1);
-    printf("%d\n", answer);
+
+    // print answer: the smallest dp[i] which is bigger than M is the answer
+    for(int i = 0; i < 10001; i++){
+        if(dp[i] >= M) {
+            printf("%d\n", i);
+            break;
+        }
+    }
+
 }
