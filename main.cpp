@@ -1,17 +1,15 @@
 #include <cstdio>
 #include <cstring>
-#include <queue>
 using namespace std;
 
 int map[1002][1002];
 int visit[1002];
-int N, M, V;
-queue<int> q;
+int N, M, count = 0;
 
 void dfs(int V){
-    printf("%d ", V);
     // visited V
     visit[V] = 1;
+    count++;
 
     // find next node
     for(int i = 1; i <= N; i++){
@@ -23,33 +21,10 @@ void dfs(int V){
     // when no deeper node exist, return (recursion)
 }
 
-void bfs(int V){
-    // use queue
-    // visited V
-    visit[V] = 1;
-    q.push(V);
-
-    // bfs until end of nodes
-    while(!q.empty()){
-        // visit front node of q
-        V = q.front();
-        q.pop();
-        printf("%d ", V);
-
-        for(int i = 1; i <= N; i++){
-            // check other nodes connected with node V
-            if(map[V][i] == 1 && visit[i] != 1){
-                // if connected and not visited yet, push node in queue and check visited
-                q.push(i);
-                visit[i] = 1;
-            }
-        }
-    }
-}
-
 int main() {
     // put inputs
-    scanf("%d %d %d", &N, &M, &V);
+    scanf("%d", &N);
+    scanf("%d", &M);
 
     // initialization
     memset(visit, 0, sizeof(visit));
@@ -65,14 +40,6 @@ int main() {
     }
 
     // dfs
-    dfs(V);
-    printf("\n");
-
-    // initialization
-    memset(visit, 0, sizeof(visit));
-
-    // bfs
-    bfs(V);
-    printf("\n");
-
+    dfs(1);
+    printf("%d\n", count-1);
 }
