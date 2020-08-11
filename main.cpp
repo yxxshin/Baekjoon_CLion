@@ -1,21 +1,17 @@
 #include <cstdio>
 #include <cstring>
-#include <vector>
-#include <algorithm>
 using namespace std;
 
-int map[27][27];
-int visit[27][27];
-int N, cnt = 0;
-vector<int> v;
+int map[52][52];
+int visit[52][52];
+int T, M, N, K, cnt = 0;
 
 void dfs(int x, int y){
-    // visited V
+    // visited map[x][y]
     visit[x][y] = 1;
-    cnt++;
 
     // find next node
-    if(visit[x+1][y] != 1 && map[x+1][y] == 1 && x+1 < N) {
+    if(visit[x+1][y] != 1 && map[x+1][y] == 1 && x+1 < M) {
         dfs(x+1, y);
     }
 
@@ -34,32 +30,30 @@ void dfs(int x, int y){
 }
 
 int main() {
-    // put inputs
-    scanf("%d", &N);
-    for(int i = 0; i < N; i++){
-        for(int j = 0; j < N; j++){
-            scanf("%1d", &map[i][j]);
+
+    scanf("%d", &T);
+    while (T--) {
+        // initialization
+        scanf("%d %d %d", &M, &N, &K);
+        cnt = 0;
+        memset(map, 0, sizeof(map));
+        memset(visit, 0, sizeof(visit));
+
+        while (K--) {
+            int input1, input2;
+            scanf("%d %d", &input1, &input2);
+            map[input1][input2] = 1;
         }
-    }
 
-    // initialization
-    memset(visit, 0, sizeof(visit));
-
-    // dfs
-    for(int i = 0; i < N; i++){
-        for(int j = 0; j < N; j++){
-            if(map[i][j] == 1 && visit[i][j] != 1) {
-                dfs(i, j);
-                v.push_back(cnt);
-                cnt = 0;
+        // dfs
+        for (int i = 0; i < M; i++) {
+            for (int j = 0; j < N; j++) {
+                if (map[i][j] == 1 && visit[i][j] != 1) {
+                    dfs(i, j);
+                    cnt++;
+                }
             }
         }
-    }
-
-    // print answer
-    sort(v.begin(), v.end());
-    printf("%d\n", v.size());
-    for(auto iter = v.begin(); iter != v.end(); iter++) {
-        printf("%d\n", *iter);
+        printf("%d\n", cnt);
     }
 }
