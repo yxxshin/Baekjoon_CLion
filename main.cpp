@@ -1,90 +1,78 @@
 #include <cstdio>
 #include <cstring>
-
+#include <queue>
 using namespace std;
 
-int arr[2002];
-// dp[S][E]: check if arr[S] to arr[E] is pelindrome
-// dp = -1 : not visited, 0 : not pelindrome, 1 : pelindrome
-int dp[2002][2002];
+int map[1002][1002];
+int visit[1002];
+int N, M, V;
+queue<int> q;
 
+void dfs(int V){
+    printf("%d ", V);
+    // visited V
+    visit[V] = 1;
 
-void func(int S, int E){
-    int s = S, e = E;
-    while(s <= e && s >= S && e <= E){
-        // one number : pelindrome
-        if( s == e ) {
-            dp[s][e] = 1;
-            s--;
-            e++;
-            continue;
-        }
-
-        // adjacent number : should be same
-        else if( e - s == 1 ){
-            if(arr[s] == arr[e]) {
-                dp[s][e] = 1;
-                s--;
-                e++;
-                continue;
-            }
-            else {
-                dp[s][e] = 0;
-                s--;
-                e++;
-                continue;
-            }
-        }
-
-        // if we already visited dp[s][e], break
-        else if(dp[s][e] != -1) break;
-
-        // if we don't know dp[s+1][e-1] either
-        else if(dp[s+1][e-1] == -1){
-            s++;
-            e--;
-            continue;
-        }
-
-        // if arr[S+1] to arr[E-1] is pelindrome and arr[S]==arr[E], arr[S] to arr[E] is pelindrome
-        else if( dp[s+1][e-1] == 1 && arr[s] == arr[e]) {
-            dp[s][e] = 1;
-            s--;
-            e++;
-            continue;
-        }
-
-        // else: not pelindrome
-        else {
-            dp[s][e] = 0;
-            s--;
-            e++;
-            continue;
+    // find next node
+    for(int i = 1; i <= N; i++){
+        if(map[V][i] == 1 && visit[i] != 1){
+            // when V and i is connected but not visited yet, go to i
+            dfs(i);
         }
     }
+    // when no deeper node exist, return (recursion)
+}
 
-    // print
-    if(dp[S][E] == 1)
-        printf("1\n");
-    else if(dp[S][E] == 0)
-        printf("0\n");
+void bfs(int V){
+    // use queue
+    // visited V
+    visit[V] = 1;
+    q.push(V);
+
+    // bfs until end of nodes
+    while(!q.empty()){
+        // visit front node of q
+        V = q.front();
+        q.pop();
+        printf("%d ", V);
+
+        for(int i = 1; i <= N; i++){
+            // check other nodes connected with node V
+            if(map[V][i] == 1 && visit[i] != 1){
+                // if connected and not visited yet, push node in queue and check visited
+                q.push(i);
+                visit[i] = 1;
+            }
+        }
+    }
 }
 
 int main() {
-    // input
-    int N, M;
-    scanf("%d",&N);
-    for(int i = 1; i <= N; i++){
-        scanf("%d",&arr[i]);
-    }
-    scanf("%d",&M);
+    // put inputs
+    scanf("%d %d %d", &N, &M, &V);
 
-    // solution
-    memset(dp, -1, sizeof(dp)); // original value of dp is all -1
+    // initialization
+    memset(visit, 0, sizeof(visit));
+    memset(map, 0, sizeof(map));
 
-    while(M--){
-        int S, E;
-        scanf("%d %d", &S, &E);
-        func(S, E);
+    // connection
+    for(int i = 0; i < M; i++){
+        int input1, input2;
+        scanf("%d %d", &input1, &input2);
+        // connect input1 and input2
+        map[input1][input2] = 1;
+        map[input2][input1] = 1;
     }
+
+    // dfs
+    dfs(V);
+    printf("\n");
+
+    // initialization
+    memset(visit, 0, sizeof(visit));
+
+    // bfs
+    bfs(V);
+    printf("\n");
+
 }
