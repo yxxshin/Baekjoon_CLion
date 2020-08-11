@@ -1,22 +1,34 @@
 #include <cstdio>
 #include <cstring>
+#include <vector>
+#include <algorithm>
 using namespace std;
 
-int map[1002][1002];
-int visit[1002];
-int N, M, count = 0;
+int map[27][27];
+int visit[27][27];
+int N, cnt = 0;
+vector<int> v;
 
-void dfs(int V){
+void dfs(int x, int y){
     // visited V
-    visit[V] = 1;
-    count++;
+    visit[x][y] = 1;
+    cnt++;
 
     // find next node
-    for(int i = 1; i <= N; i++){
-        if(map[V][i] == 1 && visit[i] != 1){
-            // when V and i is connected but not visited yet, go to i
-            dfs(i);
-        }
+    if(visit[x+1][y] != 1 && map[x+1][y] == 1 && x+1 < N) {
+        dfs(x+1, y);
+    }
+
+    if(visit[x][y+1] != 1 && map[x][y+1] == 1 && y+1 < N) {
+        dfs(x, y+1);
+    }
+
+    if(visit[x-1][y] != 1 && map[x-1][y] == 1 && x-1 >= 0) {
+        dfs(x-1, y);
+    }
+
+    if(visit[x][y-1] != 1 && map[x][y-1] == 1 && y-1 >= 0) {
+        dfs(x, y-1);
     }
     // when no deeper node exist, return (recursion)
 }
@@ -24,22 +36,30 @@ void dfs(int V){
 int main() {
     // put inputs
     scanf("%d", &N);
-    scanf("%d", &M);
+    for(int i = 0; i < N; i++){
+        for(int j = 0; j < N; j++){
+            scanf("%1d", &map[i][j]);
+        }
+    }
 
     // initialization
     memset(visit, 0, sizeof(visit));
-    memset(map, 0, sizeof(map));
-
-    // connection
-    for(int i = 0; i < M; i++){
-        int input1, input2;
-        scanf("%d %d", &input1, &input2);
-        // connect input1 and input2
-        map[input1][input2] = 1;
-        map[input2][input1] = 1;
-    }
 
     // dfs
-    dfs(1);
-    printf("%d\n", count-1);
+    for(int i = 0; i < N; i++){
+        for(int j = 0; j < N; j++){
+            if(map[i][j] == 1 && visit[i][j] != 1) {
+                dfs(i, j);
+                v.push_back(cnt);
+                cnt = 0;
+            }
+        }
+    }
+
+    // print answer
+    sort(v.begin(), v.end());
+    printf("%d\n", v.size());
+    for(auto iter = v.begin(); iter != v.end(); iter++) {
+        printf("%d\n", *iter);
+    }
 }
