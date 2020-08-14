@@ -1,59 +1,87 @@
 #include <cstdio>
 #include <cstring>
 #include <queue>
-#define MAX 100000
 using namespace std;
 
-int visit[MAX+2];
-int N, K;
-queue< pair<int, int> > q;     // <location,time>
-
-bool isValid(int val){
-    if(val >= 0 && val <= MAX && visit[val] != 1)
-        return true;
-    else return false;
-}
+int map[1002][1002];
+int visit[1002][1002];  // 0: not visited, 1: usedWall = false, -1: usedWall = true
+// to check 4 directions by 'for' loop
+int direction[4][2] = { {1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+int N, M;
+typedef struct Coord {
+    int i;
+    int j;
+    bool usedWall;
+    int dist;
+};
+queue<Coord> q;
+bool canArrive = false;
 
 void bfs(){
     // use queue
+    // start from (0,0)
+    visit[0][0] = 1;
+    q.push( Coord{0,0,false,1} );
+
     // bfs until arrival
     while(!q.empty()){
         // visit front node of q
-        pair<int, int> temp = q.front();
-        q.pop();
+        Coord temp = q.front();
 
-        // solved problem
-        if(temp.first == K) {
-            // found kid
-            printf("%d\n", temp.second);
+        // if arrived final destination
+        if(temp.i == N-1 && temp.j == M-1){
+            canArrive = true;
+            printf("%d\n", temp.dist);
             break;
         }
+        q.pop();
 
-        // check all locations which can be arrived from temp in 1 sec
-        if(isValid(temp.first - 1)){
-            visit[temp.first - 1] = 1;
-            q.push(make_pair(temp.first - 1, temp.second + 1));
-        }
+        // better case exist (not using breakWall) : delete
+        if(temp.usedWall && visit[temp.i][temp.j] == 1) continue;
 
-        if(isValid(temp.first + 1)){
-            visit[temp.first + 1] = 1;
-            q.push(make_pair(temp.first + 1, temp.second + 1));
-        }
-
-        if(isValid(temp.first * 2)) {
-            visit[temp.first * 2] = 1;
-            q.push(make_pair(temp.first * 2, temp.second + 1));
+        // check 4 directions
+        for(int i = 0; i < 4; i++){
+            int next_i = temp.i + direction[i][0];
+            int next_j = temp.j + direction[i][1];
+            if(next_i >= 0 && next_i < N && next_j >= 0 && next_j < M) {
+                // not breaking wall
+                if(map[next_i][next_j] == 0) {
+                    // if valid, push node in queue and check 'visited'
+                    // not used breakWall
+                    if(!temp.usedWall && visit[next_i][next_j] != 1) {
+                        visit[next_i][next_j] = visit[temp.i][temp.j];
+                        q.push( Coord{next_i, next_j, temp.usedWall, temp.dist + 1} );
+                    }
+                    // used breakWall
+                    else if(temp.usedWall && visit[next_i][next_j] == 0) {
+                        visit[next_i][next_j] = visit[temp.i][temp.j];
+                        q.push( Coord{next_i, next_j, temp.usedWall, temp.dist + 1} );
+                    }
+                }
+                // breaking wall
+                if(map[next_i][next_j] == 1 && !temp.usedWall && visit[next_i][next_j] == 0) {
+                    visit[next_i][next_j] = -1;
+                    q.push( Coord{next_i, next_j, true, temp.dist + 1} );
+                }
+            }
         }
     }
 }
 
 int main() {
     // put inputs
-    scanf("%d %d", &N, &K);
+    scanf("%d %d", &N, &M);
 
     // initialization
     memset(visit, 0, sizeof(visit));
-    visit[N] = 1;
-    q.push( make_pair(N,0) );
+    memset(map, 0, sizeof(map));
+    for(int i = 0; i < N; i++){
+        for(int j = 0; j < M; j++){
+            scanf("%1d", &map[i][j]);
+        }
+    }
+
+    // bfs (solution)
     bfs();
+    if(!canArrive) printf("-1\n");
 }
