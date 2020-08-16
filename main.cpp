@@ -1,87 +1,60 @@
 #include <cstdio>
-#include <cstring>
 #include <queue>
+#include <vector>
+#include <algorithm>
+#include <cstring>
 using namespace std;
+#define INF 999999999
 
-int map[1002][1002];
-int visit[1002][1002];  // 0: not visited, 1: usedWall = false, -1: usedWall = true
-// to check 4 directions by 'for' loop
-int direction[4][2] = { {1, 0}, {-1, 0}, {0, 1}, {0, -1}};
-int N, M;
-typedef struct Coord {
-    int i;
-    int j;
-    bool usedWall;
-    int dist;
-};
-queue<Coord> q;
-bool canArrive = false;
+int V, E, K;
+int dist[20002];     // dist[i] : minimum distance going to node i, gets updated
+vector< pair<int,int> > map[20002];     // connected node information : {to,value}
 
-void bfs(){
-    // use queue
-    // start from (0,0)
-    visit[0][0] = 1;
-    q.push( Coord{0,0,false,1} );
+void Dijkstra() {
+    // Dijkstra Algorithm using priority_queue
+    priority_queue< pair<int,int> > pq;
+    pq.push( make_pair(0,K) );
+    dist[K] = 0;
 
-    // bfs until arrival
-    while(!q.empty()){
-        // visit front node of q
-        Coord temp = q.front();
+    while(!pq.empty()) {
+        int current_node = pq.top().second;
+        int cost = (-1) * pq.top().first;   // to use priority_queue as minimum heap
+        pq.pop();
 
-        // if arrived final destination
-        if(temp.i == N-1 && temp.j == M-1){
-            canArrive = true;
-            printf("%d\n", temp.dist);
-            break;
-        }
-        q.pop();
+        // update values of dist
+        for(int i = 0; i < map[current_node].size(); i++){
+            int test_node = map[current_node][i].first;
+            int new_cost = cost + map[current_node][i].second;
+            int before_cost = dist[test_node];
 
-        // better case exist (not using breakWall) : delete
-        if(temp.usedWall && visit[temp.i][temp.j] == 1) continue;
-
-        // check 4 directions
-        for(int i = 0; i < 4; i++){
-            int next_i = temp.i + direction[i][0];
-            int next_j = temp.j + direction[i][1];
-            if(next_i >= 0 && next_i < N && next_j >= 0 && next_j < M) {
-                // not breaking wall
-                if(map[next_i][next_j] == 0) {
-                    // if valid, push node in queue and check 'visited'
-                    // not used breakWall
-                    if(!temp.usedWall && visit[next_i][next_j] != 1) {
-                        visit[next_i][next_j] = visit[temp.i][temp.j];
-                        q.push( Coord{next_i, next_j, temp.usedWall, temp.dist + 1} );
-                    }
-                    // used breakWall
-                    else if(temp.usedWall && visit[next_i][next_j] == 0) {
-                        visit[next_i][next_j] = visit[temp.i][temp.j];
-                        q.push( Coord{next_i, next_j, temp.usedWall, temp.dist + 1} );
-                    }
-                }
-                // breaking wall
-                if(map[next_i][next_j] == 1 && !temp.usedWall && visit[next_i][next_j] == 0) {
-                    visit[next_i][next_j] = -1;
-                    q.push( Coord{next_i, next_j, true, temp.dist + 1} );
-                }
+            // if new_cost < before_cost, update
+            if(new_cost < before_cost) {
+                dist[test_node] = new_cost;
+                pq.push( make_pair(-1 * new_cost,test_node) );
             }
         }
     }
 }
 
 int main() {
-    // put inputs
-    scanf("%d %d", &N, &M);
+    // put inputs & initialization
+    scanf("%d %d", &V, &E);
+    scanf("%d", &K);
+    while(E--){
+        int from, to, value ;
+        scanf("%d %d %d", &from, &to, &value);
+        map[from].push_back(make_pair(to,value));
+    }
+    for(int i = 1; i <= V; i++)
+        dist[i] = INF;
 
-    // initialization
-    memset(visit, 0, sizeof(visit));
-    memset(map, 0, sizeof(map));
-    for(int i = 0; i < N; i++){
-        for(int j = 0; j < M; j++){
-            scanf("%1d", &map[i][j]);
-        }
+    // solution by Dijkstra Algorithm
+    Dijkstra();
+
+    // print
+    for(int i = 1; i <= V; i++){
+        if(dist[i] != INF) printf("%d\n", dist[i]);
+        else printf("INF\n");
     }
 
-    // bfs (solution)
-    bfs();
-    if(!canArrive) printf("-1\n");
 }
