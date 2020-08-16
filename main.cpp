@@ -1,82 +1,69 @@
 #include <cstdio>
-#include <queue>
 #include <vector>
-#include <algorithm>
-#include <cstring>
-using namespace std;
 #define INF 999999999
+using namespace std;
 
-int dist[50002];     // dist[i] : minimum distance going to node i, gets updated
-vector< pair<int,int> > map[50002];  // map[from].{to,value} , if no road 0
-int n;
+typedef struct Road {
+    int from;
+    int to;
+    int value;
+};
+int N, M;
+bool isChanged = false;
+vector<Road> map;  // {from,to,value}
+long long int dist[502];  // dist[i] : minimum distance to node i, updated
 
-int Dijkstra(int from, int to) {
-    // Dijkstra Algorithm using priority_queue
-    // initialization
-    for(int i = 1; i <= n; i++)
-        dist[i] = INF;
-
-    // definition
-    priority_queue< pair<int,int> > pq;
-    pq.push( make_pair(0,from) );
-    dist[from] = 0;
-
-    while(!pq.empty()) {
-        int current_node = pq.top().second;
-        int cost = (-1) * pq.top().first;   // to use priority_queue as minimum heap
-        pq.pop();
-
-        // update values of dist
-        for(int i = 0; i < map[current_node].size(); i++){
-            int test_node = map[current_node][i].first;
-            int new_cost = cost + map[current_node][i].second;
-            int before_cost = dist[test_node];
-
-            // if new_cost < before_cost, update
-            if(new_cost < before_cost) {
-                dist[test_node] = new_cost;
-                pq.push( make_pair(-1 * new_cost, test_node) );
-            }
+void Relaxation() {
+    // relax EVERY ROADS
+    for(int i = 0; i < map.size(); i++){
+        int from_node = map[i].from;
+        int to_node = map[i].to;
+        int value = map[i].value;
+        // update
+        if(dist[from_node] == INF) continue;
+        if(dist[to_node] > dist[from_node] + value) {
+            dist[to_node] = dist[from_node] + value;
+            isChanged = true;
         }
     }
+}
 
-    if(dist[to] == INF) return -1;
-    else return dist[to];
+void BellmanFord() {
+    // Bellman-Ford Algorithm
+    dist[1] = 0;    // initialization
+    // Relaxation: N-1 times
+    for(int i = 1; i <= N-1; i++){
+        // relax EVERY ROADS every time
+        Relaxation();
+    }
+    // check if there is negative-cycle
+    // if dist changes after N-1 times of Relaxation, it means that there is a negative-cycle
+    isChanged = false;
+    Relaxation();
+    if(isChanged) {
+        printf("-1\n");
+        return;
+    }
+    else {
+        for(int i = 2; i <= N; i++){
+            if(dist[i] == INF) printf("-1\n");
+            else printf("%d\n", dist[i]);
+        }
+    }
 }
 
 int main() {
-    // put inputs & initialization
-    int T;
-    scanf("%d", &T);
-    while(T--){
-        memset(map, 0, sizeof(map));
-        vector<int> ans;
-        int m, t, s, g, h, a, b, d;
-        scanf("%d %d %d", &n, &m, &t);
-        scanf("%d %d %d", &s, &g, &h);
-        while(m--){
-            // input road
-            scanf("%d %d %d", &a, &b, &d);
-            map[a].push_back( make_pair(b,d) );
-            map[b].push_back( make_pair(a,d) );
-        }
-        while(t--){
-            // input candidates
-            int can_input;
-            scanf("%d",&can_input);
-
-            // solution by Dijkstra Algorithm
-            int d1 = Dijkstra(s,g) + Dijkstra(g,h) + Dijkstra(h,can_input);
-            int d2 = Dijkstra(s,h) + Dijkstra(h,g) + Dijkstra(g,can_input);
-            int d3 = Dijkstra(s,can_input);
-            if(d3 == min(d1,d2))
-                ans.push_back(can_input);
-        }
-
-        // sort answer vector
-        sort(ans.begin(), ans.end());
-        for(int i = 0; i < ans.size(); i++)
-            printf("%d ", ans.at(i));
-        printf("\n");
+    // put inputs
+    scanf("%d %d", &N, &M);
+    while(M--){
+        int A, B, C;
+        scanf("%d %d %d", &A, &B, &C);
+        map.push_back( {A,B,C} );
     }
+
+    for(int i = 2; i <= N; i++){
+        dist[i] = INF;
+    }
+    // Solution by Bellman-Ford Algorithm
+    BellmanFord();
 }
