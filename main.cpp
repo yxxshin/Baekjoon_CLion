@@ -1,10 +1,12 @@
 #include <cstdio>
 #include <vector>
+#define MAX_NODE 100000
 using namespace std;
 
 int N;
 vector<int> inorder;
 vector<int> postorder;
+int place[MAX_NODE+2];
 
 void make_tree(int inorder_start, int inorder_end, int postorder_start, int postorder_end){
     // it isn't a tree : skip
@@ -13,15 +15,7 @@ void make_tree(int inorder_start, int inorder_end, int postorder_start, int post
 
     // last number of postorder is "root node"
     int root = postorder[postorder_end];
-    int root_place;
-
-    // find root node's place on inorder
-    for(int i = inorder_start; i <= inorder_end; i++){
-        if(inorder[i] == root) {
-            root_place = i;
-            break;
-        }
-    }
+    int root_place = place[root];
 
     // print root (preorderTraversal)
     printf("%d ", root);
@@ -43,7 +37,9 @@ int main() {
         scanf("%d", &temp);
         postorder.push_back(temp);
     }
-
+    for(int i = 0; i < N; i++){
+        place[inorder[i]] = i;
+    }
     // make tree ( answer printed )
     make_tree(0, N-1, 0, N-1);
 }
