@@ -1,45 +1,38 @@
 #include <cstdio>
 #include <vector>
-#define MAX_NODE 100000
 using namespace std;
 
 int N;
-vector<int> inorder;
-vector<int> postorder;
-int place[MAX_NODE+2];
+vector<int> preorder;
 
-void make_tree(int inorder_start, int inorder_end, int postorder_start, int postorder_end){
-    // it isn't a tree : skip
-    if(inorder_start > inorder_end || postorder_start > postorder_end)
+void make_tree(int start, int end){
+    // if not a tree (finished finding) : skip
+    if(start > end)
         return;
 
-    // last number of postorder is "root node"
-    int root = postorder[postorder_end];
-    int root_place = place[root];
+    // first number is root
+    int root = preorder[start];
 
-    // print root (preorderTraversal)
-    printf("%d ", root);
+    // left sub-tree is all smaller than root, and right sub-tree is all bigger than root
+    int divide = end+1; // first number's place which is bigger than root. if nothing : end+1
+    for(int i = start; i <= end; i++){
+        if(preorder[i] > root) {
+            divide = i;
+            break;
+        }
+    }
 
-    // make next two trees (left / right based on root_place)
-    make_tree(inorder_start, root_place - 1, postorder_start, postorder_start + root_place - inorder_start - 1);
-    make_tree(root_place + 1, inorder_end, postorder_start + root_place - inorder_start, postorder_end - 1);
+    // divide into two sub-trees based on 'divide'
+    make_tree(start+1, divide-1);
+    make_tree(divide,end);
+    printf("%d\n",root);
 }
 
 int main() {
     // save inputs
     int temp;
-    scanf("%d", &N);
-    for(int i = 0; i < N; i++){
-        scanf("%d", &temp);
-        inorder.push_back(temp);
+    while(scanf("%d", &temp) != EOF) {
+        preorder.push_back(temp);
     }
-    for(int i = 0; i < N; i++){
-        scanf("%d", &temp);
-        postorder.push_back(temp);
-    }
-    for(int i = 0; i < N; i++){
-        place[inorder[i]] = i;
-    }
-    // make tree ( answer printed )
-    make_tree(0, N-1, 0, N-1);
+    make_tree(0,preorder.size()-1);
 }
