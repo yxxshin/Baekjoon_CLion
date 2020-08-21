@@ -1,40 +1,61 @@
 #include <cstdio>
 #include <vector>
+#include <cstring>
 #define MAX_NODE 100000
 using namespace std;
 
-int N;
-bool visit[MAX_NODE+2];     // check if visited or not
-int parent[MAX_NODE+2];     // parent[i] : parent node of node i
-vector<int> tree[MAX_NODE+2];   // save edges
+// Idea : pick the farthest node from any node
+// Then, find the farthest node from 'that' node
 
-void dfs(int node){
+int V, farthest_node, max_value;
+bool visit[MAX_NODE+2];     // check if visited or not
+vector< pair<int,int> > tree[MAX_NODE+2];   // tree[start].{end,value}
+
+void dfs(int node, int dist){
+    // if already visited, return
+    if(visit[node])
+        return;
+
+    // update
     visit[node] = true;
+    if(max_value < dist) {
+        max_value = dist;
+        farthest_node = node;
+    }
+
+    // dfs
     for(int i = 0; i < tree[node].size(); i++) {
-        int next_node = tree[node].at(i);
+        int next_node = tree[node].at(i).first;
+        int next_value = dist + tree[node].at(i).second;
         // if not visited yet, 'node' is parent of 'next_node'
         if(!visit[next_node]) {
-            parent[next_node] = node;
-            dfs(next_node);
+            dfs(next_node, next_value);
         }
     }
 }
 
 int main() {
-    scanf("%d", &N);
-    for(int i = 0; i < N-1; i++){
-        int input1, input2;
-        scanf("%d %d", &input1, &input2);
-        // put inputs in tree
-        tree[input1].push_back(input2);
-        tree[input2].push_back(input1);
+    // save inputs
+    scanf("%d", &V);
+    for(int i = 0; i < V; i++){
+        int start, end, value;
+        scanf("%d", &start);
+        scanf("%d", &end);
+        while(end != -1){
+            scanf("%d", &value);
+            tree[start].push_back(make_pair(end, value));
+            scanf("%d", &end);
+        }
     }
 
-    // use dfs to find parent values
-    dfs(1);
+    // find the farthest node from any node. (This case, from node 1)
+    memset(visit, false, sizeof(visit));
+    dfs(1,0);
 
-    // print parent nodes
-    for(int i = 2; i <= N; i++){
-        printf("%d\n", parent[i]);
-    }
+    // find the max_distance from 'farthest_node'
+    memset(visit, false, sizeof(visit));
+    dfs(farthest_node, 0);
+
+    // print
+    printf("%d\n", max_value);
 }
