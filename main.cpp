@@ -1,6 +1,12 @@
 #include <cstdio>
-#define MAX_NODE 26
+#define MAX_NODE 1000
 using namespace std;
+
+// Tree Order - int version
+// input the number of nodes N first
+// then, enter "node_num left_child right_child" for the next N lines
+// if there is no child(left or right), enter 0 each
+// the root number should be 1
 
 typedef struct Node {
     int left;
@@ -9,23 +15,14 @@ typedef struct Node {
 int N;
 Node tree[MAX_NODE+2];
 
-// char to int
-int ctoi(char c) {
-    return c - 'A';
-}
-// int to char
-char itoc(int n) {
-    return n + 'A';
-}
-
 void visit(int node){
-    if(node != ctoi('.')) {
-        printf("%c",itoc(node));
+    if(node != 0) {
+        printf("%d ",node);
     }
 }
 
 void preorderTraversal(int name) {
-    if(name != ctoi('.')){
+    if(name != 0){
         visit(name);
         preorderTraversal(tree[name].left);
         preorderTraversal(tree[name].right);
@@ -33,7 +30,7 @@ void preorderTraversal(int name) {
 }
 
 void inorderTraversal(int name){
-    if(name != ctoi('.')){
+    if(name != 0){
         inorderTraversal(tree[name].left);
         visit(name);
         inorderTraversal(tree[name].right);
@@ -41,7 +38,7 @@ void inorderTraversal(int name){
 }
 
 void postorderTraversal(int name){
-    if(name != ctoi('.')) {
+    if(name != 0) {
         postorderTraversal(tree[name].left);
         postorderTraversal(tree[name].right);
         visit(name);
@@ -54,17 +51,17 @@ int main() {
     scanf("%d", &N);
     for(int i = 0; i < N; i++){
         scanf("%c", &buffer);   // collect '\n'
-        char node, left, right;
-        scanf("%c %c %c", &node, &left, &right);
-        tree[ctoi(node)].left = ctoi(left);
-        tree[ctoi(node)].right = ctoi(right);
+        int node, left, right;
+        scanf("%d %d %d", &node, &left, &right);
+        tree[node].left = left;
+        tree[node].right = right;
     }
 
     // print answers
-    preorderTraversal(ctoi('A'));
+    preorderTraversal(1);
     printf("\n");
-    inorderTraversal(ctoi('A'));
+    inorderTraversal(1);
     printf("\n");
-    postorderTraversal(ctoi('A'));
+    postorderTraversal(1);
     printf("\n");
 }
