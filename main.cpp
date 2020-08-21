@@ -7,7 +7,7 @@ using namespace std;
 // Idea : pick the farthest node from any node
 // Then, find the farthest node from 'that' node
 
-int V, farthest_node, max_value;
+int n, farthest_node, max_value;
 bool visit[MAX_NODE+2];     // check if visited or not
 vector< pair<int,int> > tree[MAX_NODE+2];   // tree[start].{end,value}
 
@@ -36,16 +36,12 @@ void dfs(int node, int dist){
 
 int main() {
     // save inputs
-    scanf("%d", &V);
-    for(int i = 0; i < V; i++){
+    scanf("%d", &n);
+    for(int i = 0; i < n-1; i++){
         int start, end, value;
-        scanf("%d", &start);
-        scanf("%d", &end);
-        while(end != -1){
-            scanf("%d", &value);
-            tree[start].push_back(make_pair(end, value));
-            scanf("%d", &end);
-        }
+        scanf("%d %d %d", &start, &end, &value);
+        tree[start].push_back(make_pair(end,value));
+        tree[end].push_back(make_pair(start,value));
     }
 
     // find the farthest node from any node. (This case, from node 1)
