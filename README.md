@@ -1,10 +1,10 @@
-# 신연상의 백준 풀이모음집
-### feat. SNUECE 19 PS Study
+# 신연상의 백준 풀이모음집 🌟
+### feat. SNUECE 19 PS Study ⚡️
 
 바보같이 한 파일에 덮어쓰면서 시작해서,  
 Commit 기록에서 지난 파일들을 확인할 수 있다
 -----
-(사진)   
+![Picture](https://user-images.githubusercontent.com/63148508/90919661-d19cf680-e421-11ea-9d40-22b407514230.png)   
 이렇게 정리함
 -----
 #### 특정 문제번호의 풀이 찾는 방법
