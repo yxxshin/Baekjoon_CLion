@@ -1,49 +1,40 @@
 #include <cstdio>
-#include <algorithm>
-#define INF 999999999
+#include <vector>
+#define MAX_NODE 100000
 using namespace std;
-int V, E;
-int dp[402][402];
 
-void Floyd_Warshall() {
-    // consider passing node 'temp'
-    for(int temp = 1; temp <= V; temp++){
-        for(int i = 1; i <= V; i++){
-            for(int j = 1; j <= V; j++){
-                if(dp[i][temp] != INF && dp[temp][j] != INF){
-                    dp[i][j] = min(dp[i][j], dp[i][temp] + dp[temp][j]);
-                }
-            }
+int N;
+bool visit[MAX_NODE+2];     // check if visited or not
+int parent[MAX_NODE+2];     // parent[i] : parent node of node i
+vector<int> tree[MAX_NODE+2];   // save edges
+
+void dfs(int node){
+    visit[node] = true;
+    for(int i = 0; i < tree[node].size(); i++) {
+        int next_node = tree[node].at(i);
+        // if not visited yet, 'node' is parent of 'next_node'
+        if(!visit[next_node]) {
+            parent[next_node] = node;
+            dfs(next_node);
         }
     }
 }
+
 int main() {
-    // get inputs & initialization
-    scanf("%d %d", &V, &E);
-    for(int i = 1; i <= V; i++){
-        for(int j = 1; j <= V; j++){
-            if(i == j) dp[i][j] = 0;
-            else dp[i][j] = INF;
-        }
+    scanf("%d", &N);
+    for(int i = 0; i < N-1; i++){
+        int input1, input2;
+        scanf("%d %d", &input1, &input2);
+        // put inputs in tree
+        tree[input1].push_back(input2);
+        tree[input2].push_back(input1);
     }
 
-    while(E--){
-        int from, to, value;
-        scanf("%d %d %d", &from, &to, &value);
-        if(dp[from][to] > value)
-            dp[from][to] = value;
+    // use dfs to find parent values
+    dfs(1);
+
+    // print parent nodes
+    for(int i = 2; i <= N; i++){
+        printf("%d\n", parent[i]);
     }
-
-    Floyd_Warshall();
-
-    int ans = INF;
-    for(int i = 1; i <= V; i++){
-        for(int j = 1; j <= V; j++){
-            if(i != j) ans = min(ans, dp[i][j] + dp[j][i]);
-        }
-    }
-
-    if(ans == INF)
-        printf("-1\n");
-    else printf("%d\n", ans);
 }
