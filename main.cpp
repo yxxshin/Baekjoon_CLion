@@ -1,67 +1,49 @@
 #include <cstdio>
-#define MAX_NODE 1000
+#include <vector>
 using namespace std;
 
-// Tree Order - int version
-// input the number of nodes N first
-// then, enter "node_num left_child right_child" for the next N lines
-// if there is no child(left or right), enter 0 each
-// the root number should be 1
-
-typedef struct Node {
-    int left;
-    int right;
-};
 int N;
-Node tree[MAX_NODE+2];
+vector<int> inorder;
+vector<int> postorder;
 
-void visit(int node){
-    if(node != 0) {
-        printf("%d ",node);
-    }
-}
+void make_tree(int inorder_start, int inorder_end, int postorder_start, int postorder_end){
+    // it isn't a tree : skip
+    if(inorder_start > inorder_end || postorder_start > postorder_end)
+        return;
 
-void preorderTraversal(int name) {
-    if(name != 0){
-        visit(name);
-        preorderTraversal(tree[name].left);
-        preorderTraversal(tree[name].right);
-    }
-}
+    // last number of postorder is "root node"
+    int root = postorder[postorder_end];
+    int root_place;
 
-void inorderTraversal(int name){
-    if(name != 0){
-        inorderTraversal(tree[name].left);
-        visit(name);
-        inorderTraversal(tree[name].right);
+    // find root node's place on inorder
+    for(int i = inorder_start; i <= inorder_end; i++){
+        if(inorder[i] == root) {
+            root_place = i;
+            break;
+        }
     }
-}
 
-void postorderTraversal(int name){
-    if(name != 0) {
-        postorderTraversal(tree[name].left);
-        postorderTraversal(tree[name].right);
-        visit(name);
-    }
+    // print root (preorderTraversal)
+    printf("%d ", root);
+
+    // make next two trees (left / right based on root_place)
+    make_tree(inorder_start, root_place - 1, postorder_start, postorder_start + root_place - inorder_start - 1);
+    make_tree(root_place + 1, inorder_end, postorder_start + root_place - inorder_start, postorder_end - 1);
 }
 
 int main() {
     // save inputs
-    char buffer;
+    int temp;
     scanf("%d", &N);
     for(int i = 0; i < N; i++){
-        scanf("%c", &buffer);   // collect '\n'
-        int node, left, right;
-        scanf("%d %d %d", &node, &left, &right);
-        tree[node].left = left;
-        tree[node].right = right;
+        scanf("%d", &temp);
+        inorder.push_back(temp);
+    }
+    for(int i = 0; i < N; i++){
+        scanf("%d", &temp);
+        postorder.push_back(temp);
     }
 
-    // print answers
-    preorderTraversal(1);
-    printf("\n");
-    inorderTraversal(1);
-    printf("\n");
-    postorderTraversal(1);
-    printf("\n");
+    // make tree ( answer printed )
+    make_tree(0, N-1, 0, N-1);
 }
