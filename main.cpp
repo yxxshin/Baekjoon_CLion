@@ -1,16 +1,19 @@
 #include <cstdio>
-#define MAX_N 1000000
+#define MAX_N 200
+#define MAX_M 1000
 using namespace std;
 
-int n, m;
+int N, M;
+bool ans = true;
 int parent[MAX_N+3];    // parent[i] : i'th node's parent
 int level[MAX_N+3];     // level[i]: tree level which i'th node is included
+int plan[MAX_M+3];
 int find(int u) {
     // if root node, return
     if(u == parent[u])
         return u;
 
-    // else : go up to find root node
+        // else : go up to find root node
     else {
         // path compression : every parent[node] would be root, so time is saved for second time
         return parent[u] = find(parent[u]);
@@ -43,29 +46,40 @@ void merge(int u, int v){
 }
 
 int main() {
-    scanf("%d %d", &n, &m);
+    scanf("%d", &N);
+    scanf("%d", &M);
+
     // initialization
-    for(int i = 1; i <= n; i++){
+    for(int i = 1; i <= N; i++){
         parent[i] = i;  // root node : parent is itself
         level[i] = 1;
     }
 
-    while(m--){
-        int type, a, b;
-        scanf("%d %d %d", &type, &a, &b);
-        if(type == 0)
-            merge(a,b);
-
-        else if(type == 1){
-            if( find(a) == find(b) ){
-                // in the same tree
-                printf("YES\n");
-            }
-            else{
-                // in different tree
-                printf("NO\n");
+    // Merge by inputs
+    int input;
+    for(int i = 1; i <= N; i++){
+        for(int j = 1; j <= N; j++){
+            scanf("%d", &input);
+            if(input == 1){
+                merge(i,j);
             }
         }
-
     }
+
+    // get plan
+    for(int i = 0; i < M; i++) {
+        scanf("%d", &plan[i]);
+    }
+
+    // find if we can travel by plan
+    for(int i = 0; i < M-1; i++){
+        if( find(plan[i]) != find(plan[i+1]) ) {
+            ans = false;
+            break;
+        }
+    }
+
+    // print answer
+    if(ans) printf("YES\n");
+    else printf("NO\n");
 }
