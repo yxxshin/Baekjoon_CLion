@@ -1,38 +1,71 @@
 #include <cstdio>
-#include <vector>
+#define MAX_N 1000000
 using namespace std;
 
-int N;
-vector<int> preorder;
+int n, m;
+int parent[MAX_N+3];    // parent[i] : i'th node's parent
+int level[MAX_N+3];     // level[i]: tree level which i'th node is included
+int find(int u) {
+    // if root node, return
+    if(u == parent[u])
+        return u;
 
-void make_tree(int start, int end){
-    // if not a tree (finished finding) : skip
-    if(start > end)
+    // else : go up to find root node
+    else {
+        // path compression : every parent[node] would be root, so time is saved for second time
+        return parent[u] = find(parent[u]);
+    }
+}
+
+// Union : merge tree u to tree v
+void merge(int u, int v){
+    // find u and v 's root node
+    u = find(u);
+    v = find(v);
+
+    // if roots are same, they are already in the same tree
+    if(u == v)
         return;
 
-    // first number is root
-    int root = preorder[start];
-
-    // left sub-tree is all smaller than root, and right sub-tree is all bigger than root
-    int divide = end+1; // first number's place which is bigger than root. if nothing : end+1
-    for(int i = start; i <= end; i++){
-        if(preorder[i] > root) {
-            divide = i;
-            break;
-        }
+    // if tree 'u' is deeper than 'v', swap
+    if(level[u] > level[v]){
+        int temp = u;
+        u = v;
+        v = temp;
     }
 
-    // divide into two sub-trees based on 'divide'
-    make_tree(start+1, divide-1);
-    make_tree(divide,end);
-    printf("%d\n",root);
+    // merge two trees
+    parent[u] = v;
+
+    // if the two trees have same level, +1
+    if(level[u] == level[v])
+        level[v]++;
 }
 
 int main() {
-    // save inputs
-    int temp;
-    while(scanf("%d", &temp) != EOF) {
-        preorder.push_back(temp);
+    scanf("%d %d", &n, &m);
+    // initialization
+    for(int i = 1; i <= n; i++){
+        parent[i] = i;  // root node : parent is itself
+        level[i] = 1;
     }
-    make_tree(0,preorder.size()-1);
+
+    while(m--){
+        int type, a, b;
+        scanf("%d %d %d", &type, &a, &b);
+        if(type == 0)
+            merge(a,b);
+
+        else if(type == 1){
+            if( find(a) == find(b) ){
+                // in the same tree
+                printf("YES\n");
+            }
+            else{
+                // in different tree
+                printf("NO\n");
+            }
+        }
+
+    }
 }
