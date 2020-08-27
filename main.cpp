@@ -1,27 +1,39 @@
 #include <cstdio>
 #include <vector>
 #include <algorithm>
-#include <cmath>
-#define MAX_N 100
+#define MAX_N 100000
 using namespace std;
 
-int n;
-double ans = 0;
+int N;
+int ans = 0;
 
-typedef struct Star {
-    double x;
-    double y;
+typedef struct Planet {
+    int x;
+    int y;
+    int z;
+    int num;
 };
 
 typedef struct Road {
-    int s1_num;
-    int s2_num;
-    double len;
+    int p1_num;
+    int p2_num;
+    int len;
 };
 
-double distance(Star s1, Star s2){
-    double d = pow(s1.x-s2.x,2) + pow(s1.y-s2.y,2);
-    return sqrt(d);
+bool comp_x(Planet p1, Planet p2){
+    return (p1.x < p2.x);
+}
+
+bool comp_y(Planet p1, Planet p2){
+    return (p1.y < p2.y);
+}
+
+bool comp_z(Planet p1, Planet p2){
+    return (p1.z < p2.z);
+}
+
+bool comp_num(Planet p1, Planet p2){
+    return (p1.num < p2.num);
 }
 
 bool comp_road(Road r1, Road r2){
@@ -29,7 +41,7 @@ bool comp_road(Road r1, Road r2){
 }
 
 int parent[MAX_N+2];
-Star stars[MAX_N+2];
+vector<Planet> planets;
 vector<Road> map;
 
 // Union-Find
@@ -50,44 +62,56 @@ void Kruksal() {
     for(int j = 0; j < map.size(); j++){
         // Kruksal Algorithm: pick smallest-value road each time (Greedy Algorithm)
         // make sure the roads don't make a circuit (Union-Find)
-        if( find(map[j].s1_num) != find(map[j].s2_num)){
-            merge(map[j].s1_num, map[j].s2_num);
+        if( find(map[j].p1_num) != find(map[j].p2_num)){
+            merge(map[j].p1_num, map[j].p2_num);
             count++;
             ans += map[j].len;
         }
-        // There should be n-1 roads at MST
-        if(count == n-1)
+        // There should be N-1 roads at MST
+        if(count == N-1)
             break;
     }
 }
 
 int main() {
     // inputs
-    scanf("%d", &n);
-    for(int i = 1; i <= n; i ++){
-        double x, y;
-        scanf("%lf %lf", &x, &y);
-        stars[i] = Star{x,y};
+    scanf("%d", &N);
+    for(int i = 1; i <= N; i++){
+        int x, y, z;
+        scanf("%d %d %d", &x, &y, &z);
+        planets.push_back(Planet{x,y,z,i});
     }
 
     // initialization
-    for(int i = 1; i <= n; i++){
+    for(int i = 1; i <= N; i++){
         parent[i] = i;
     }
 
     // make map
-    for(int i = 1; i <= n; i++){
-        for(int j = i+1; j <= n; j++){
-            map.push_back( { i, j, distance(stars[i],stars[j]) } );
-        }
+    // sort by x and just push adjacent ones
+    sort(planets.begin(), planets.end(), comp_x);
+
+    for(int i = 0; i <= N-2; i++){
+        map.push_back( {planets[i].num, planets[i+1].num, planets[i+1].x - planets[i].x} );
     }
 
-    // sort roads by "value" for Kruksal Algorithm
-    sort(map.begin(), map.end(), comp_road);
+    // sort by y and just push adjacent ones
+    sort(planets.begin(), planets.end(), comp_y);
+    for(int i = 0; i <= N-2; i++){
+        map.push_back( {planets[i].num, planets[i+1].num, planets[i+1].y - planets[i].y} );
+    }
 
-    // Kruksal Algorithm
+    // sort by z and just push adjacent ones
+    sort(planets.begin(), planets.end(), comp_z);
+    for(int i = 0; i <= N-2; i++){
+        map.push_back( {planets[i].num, planets[i+1].num, planets[i+1].z - planets[i].z} );
+    }
+
+    // sort originally and use Kruksal Algorithm
+    sort(planets.begin(), planets.end(), comp_num);
+    sort(map.begin(), map.end(), comp_road);
     Kruksal();
 
     // print answer
-    printf("%lf\n", ans);
+    printf("%d\n", ans);
 }
