@@ -1,4 +1,5 @@
 # 신연상의 백준 풀이모음집 🌟
+## * *[Algorithm Repo]로 깔끔하게 정리해서 옮겨놓음*
 ### feat. SNUECE 19 PS Study ⚡️ (https://www.acmicpc.net/group/8324)
 #### 한 파일에 덮어쓰면서 시작해서, Commit 기록에서 지난 파일들을 확인할 수 있다
 -----
@@ -15,3 +16,5 @@
 - 언어: C++
 - 모든 부분에 주석을 달기 위해 노력함.   
 저번 프로그래밍 방법론 수업에서 파일 내부에 한글이 없는 것이 좋다는 조교님 말씀을 계기삼아 주석까지 모두 영어로 적음.
+
+[Algorithm Repo]: https://github.com/yxxshin/Algorithm_Study/tree/master/Baekjoon
